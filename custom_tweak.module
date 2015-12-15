@@ -12,9 +12,8 @@ function custom_tweak_menu() {
   $items['page_json/%/%'] = array(
     'title' => 'JSON representation of a node',
     'page callback' => 'custom_tweak_json_node',
-    'page arguments' => array(1, 2),
-    'access callback' => 'user_access',
-    'access arguments' => array('Administer site configuration'),
+    'page arguments' => array(1, 2),   
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,   
   );	
   return $items;
