@@ -34,8 +34,19 @@ function custom_tweak_form_alter(&$form, &$form_state, $form_id) {
 	
 	// Update the text of submit button
 	$form['actions']['submit']['#value'] = 'Update Configuration';
-	//error_log(print_r($form, true)); 
+	//This ensure that all the submit handler defined for this form by all the modules have been placed.
+    $form['#submit'][count($form['#submit'])] = 'custom_tweak_submit';		
   }	
+}
+
+/**
+ * Custom submit handler for the site information form. This function sets
+ * the site API key
+ */
+function custom_tweak_submit($form, &$form_state) {  
+  $siteapikey = filter_xss(trim($form_state['values']['siteapikey']));
+  variable_set('siteapikey', $siteapikey);
+  drupal_set_message(t('The new value of the site API key @api has been saved successfully.', array('@api' => $siteapikey)));  
 }
 
 /**
