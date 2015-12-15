@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * integrate an site API key.
+ */
+ 
+/**
+ * Implements hook_menu().
+ */
+function custom_tweak_menu() {
+  $items['page_json/%/%'] = array(
+    'title' => 'JSON representation of a node',
+    'page callback' => 'custom_tweak_json_node',
+    'page arguments' => array(1, 2),
+    'access callback' => 'user_access',
+    'access arguments' => array('Administer site configuration'),
+    'type' => MENU_CALLBACK,   
+  );	
+  return $items;
+}
+
+/**
+ * Implements hook_form_alter()
+ */
+function custom_tweak_form_alter(&$form, &$form_state, $form_id) {
+  //The following section of code ensures that the form field 'siteapikey' is added in the site information section	
+  if ( $form_id == 'system_site_information_settings' ) {	
+    $form['site_information']['siteapikey']	= array(
+	  '#type' => 'textfield',
+	  '#title' => t('Site API Key'),
+	  '#default_value' => variable_get('siteapikey', 'No API Key yet'),
+	);
+	
+	// Update the text of submit button
+	$form['actions']['submit']['#value'] = 'Update Configuration';
+	//error_log(print_r($form, true)); 
+  }	
+}
+
+/**
+ * Menu callback; Retrieve a JSON object containing information related to page type node.
+ */
+function custom_tweak_json_node($api_key, $node_id) {
+  $api_key = filter_xss(trim($api_key));	
+  $node_id = filter_xss(trim($node_id));	
+  $valid = TRUE;
+    
+  if ( $api_key != '' && $api_key != variable_get('siteapikey', '')) {
+	// If the API key does not matches with the stored API key  
+	$valid = FALSE;  
+  }
+  
+  // Loads node object
+  $node_object =  node_load($node_id); 
+  // Checks whether the node is of the type 'page'
+  if ( $node_object->type != 'page' ) {	  
+	  $valid = FALSE; 	
+  }		
+  
+  if ( $valid === TRUE ) {	
+    $matches[$node_id] = $node_object;	    
+    drupal_json_output($matches);  
+  } 
+  else {
+	drupal_access_denied();  
+  }  
+}

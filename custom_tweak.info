@@ -1,0 +1,5 @@
+name = Custom Tweaks
+description = This module tweaks different information in the Drupal site
+core = 7.x
+package = Custom
+version = VERSION
